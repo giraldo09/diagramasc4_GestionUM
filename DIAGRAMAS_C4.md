@@ -130,59 +130,89 @@ El diagrama de componentes descompone el contenedor API Backend en sus component
 ### Diagrama
 
 ```mermaid
-C4Component
-    title Diagrama de Componentes - API Backend
+flowchart LR
+    subgraph API_Backend ["API Backend (Node.js, Express.js)"]
+    
+        subgraph ServerBoundary ["Server (Express.js)"]
+            server["Server
+            - Servidor HTTP
+            - Middleware
+            - Rutas
+            - Errores"]
+        end
+        
+        subgraph Routes ["Rutas (Express Router)"]
+            auth_routes["Auth Routes
+            - Registro
+            - Login
+            - Verificación
+            - Logout"]
 
-    Container(api, "API Backend", "Node.js, Express.js", "API REST del sistema")
-    
-    Component_Boundary(api_boundary, "API Backend") {
-        Component(server, "Server", "Express.js", "Servidor HTTP principal. Configura middleware, rutas y manejo de errores.")
+            schedule_routes["Schedule Routes
+            - CRUD horarios"]
+
+            appointment_routes["Appointment Routes
+            - Citas psicológicas"]
+
+            notification_routes["Notification Routes
+            - Notificaciones"]
+
+            profile_routes["Profile Routes
+            - Perfil de usuario"]
+        end
         
-        Component(auth_routes, "Auth Routes", "Express Router", "Gestiona autenticación: registro, login, verificación, logout")
-        Component(schedule_routes, "Schedule Routes", "Express Router", "Gestiona horarios académicos: CRUD completo")
-        Component(appointment_routes, "Appointment Routes", "Express Router", "Gestiona citas psicológicas: solicitar, cancelar, reprogramar")
-        Component(notification_routes, "Notification Routes", "Express Router", "Gestiona notificaciones: consultar, marcar como leída, eliminar")
-        Component(profile_routes, "Profile Routes", "Express Router", "Gestiona perfil de usuario: consultar, actualizar")
-        
-        Component(auth_middleware, "Auth Middleware", "JavaScript", "Autenticación JWT, generación de tokens, verificación de usuarios")
-        Component(validation_middleware, "Validation Middleware", "express-validator", "Validación de datos de entrada, sanitización")
-        
-        Component(security_middleware, "Security Middleware", "helmet, cors, rate-limit", "Protección HTTP, CORS, rate limiting")
-        
-        Component(database_config, "Database Config", "Supabase Client", "Configuración y cliente de Supabase para acceso a base de datos")
-    }
-    
-    System_Ext(supabase_db, "Supabase Database", "PostgreSQL")
-    
-    Rel(server, auth_routes, "Usa")
-    Rel(server, schedule_routes, "Usa")
-    Rel(server, appointment_routes, "Usa")
-    Rel(server, notification_routes, "Usa")
-    Rel(server, profile_routes, "Usa")
-    Rel(server, security_middleware, "Usa")
-    
-    Rel(auth_routes, auth_middleware, "Usa")
-    Rel(auth_routes, validation_middleware, "Usa")
-    Rel(auth_routes, database_config, "Usa")
-    
-    Rel(schedule_routes, auth_middleware, "Usa")
-    Rel(schedule_routes, validation_middleware, "Usa")
-    Rel(schedule_routes, database_config, "Usa")
-    
-    Rel(appointment_routes, auth_middleware, "Usa")
-    Rel(appointment_routes, validation_middleware, "Usa")
-    Rel(appointment_routes, database_config, "Usa")
-    
-    Rel(notification_routes, auth_middleware, "Usa")
-    Rel(notification_routes, database_config, "Usa")
-    
-    Rel(profile_routes, auth_middleware, "Usa")
-    Rel(profile_routes, validation_middleware, "Usa")
-    Rel(profile_routes, database_config, "Usa")
-    
-    Rel(database_config, supabase_db, "Lee y escribe", "HTTPS/PostgREST API")
-    
-    UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
+        subgraph Middlewares ["Middlewares"]
+            auth_middleware["Auth Middleware
+            - JWT
+            - Tokens
+            - Verificación"]
+
+            validation_middleware["Validation Middleware
+            - express-validator"]
+
+            security_middleware["Security Middleware
+            - helmet
+            - cors
+            - rate limiting"]
+        end
+
+        database_config["Database Config
+        - Supabase Client
+        - Config y acceso a DB"]
+    end
+
+    supabase_db[("Supabase Database
+    PostgreSQL")]
+
+    %% Relaciones principales
+    server --> auth_routes
+    server --> schedule_routes
+    server --> appointment_routes
+    server --> notification_routes
+    server --> profile_routes
+    server --> security_middleware
+
+    auth_routes --> auth_middleware
+    auth_routes --> validation_middleware
+    auth_routes --> database_config
+
+    schedule_routes --> auth_middleware
+    schedule_routes --> validation_middleware
+    schedule_routes --> database_config
+
+    appointment_routes --> auth_middleware
+    appointment_routes --> validation_middleware
+    appointment_routes --> database_config
+
+    notification_routes --> auth_middleware
+    notification_routes --> database_config
+
+    profile_routes --> auth_middleware
+    profile_routes --> validation_middleware
+    profile_routes --> database_config
+
+    database_config --> supabase_db
+
 ```
 
 ### Descripción de Componentes
@@ -358,6 +388,7 @@ classDiagram
 **UserModel:**
 - Representa la estructura de datos de un usuario en la base de datos
 - Campos: id, cedula, password_hash, nombre, apellido, email, programa, semestre, telefono
+
 
 
 
